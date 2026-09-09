@@ -1,5 +1,7 @@
 # KW
 
+<img width="300" height="300" alt="image" src="https://github.com/user-attachments/assets/7377e42b-f1cc-4981-be41-5520279e8a79" />
+
 Zeigt die aktuelle Kalenderwoche (ISO 8601) und ihre Datumsrange. Statische Seite,
 keine Abhängigkeiten, kein Build-Step. Image: **2,8 MB** (busybox httpd).
 
