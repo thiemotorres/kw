@@ -3,6 +3,10 @@
 Zeigt die aktuelle Kalenderwoche (ISO 8601) und ihre Datumsrange. Statische Seite,
 keine Abhängigkeiten, kein Build-Step. Image: **2,8 MB** (busybox httpd).
 
+Die Karte ist 80 % breit auf Mobil, 33 % ab 768px — alles darin skaliert über die
+eine CSS-Variable `--w` in `main`. Farbe von Ring und Zahl: `--grad-a` / `--grad-b`
+in `:root` (Neon Pink als Default, Neon Grün als Kommentar daneben).
+
 ## Routes
 
 | Pfad | Zeigt |
