@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>KW</title>
+<style>
+  :root {
+    --grad-a: #a78bfa;
+    --grad-b: #38bdf8;
+    --glass: rgba(255, 255, 255, .055);
+    --edge: rgba(255, 255, 255, .13);
+    --shine: inset 0 1px 0 rgba(255, 255, 255, .18);
+  }
+
+  * { box-sizing: border-box }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    overflow: hidden;
+    background: #07080c;
+    color: #fff;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Farbige Blobs — geben dem Glas überhaupt erst etwas zum Verwischen */
+  body::before, body::after {
+    content: "";
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: .55;
+    pointer-events: none;
+  }
+  body::before {
+    width: 62vmax; height: 62vmax;
+    top: -22vmax; left: -16vmax;
+    background: #6d28d9;
+    animation: drift 26s ease-in-out infinite alternate;
+  }
+  body::after {
+    width: 52vmax; height: 52vmax;
+    bottom: -20vmax; right: -14vmax;
+    background: #0e7490;
+    animation: drift 34s ease-in-out infinite alternate-reverse;
+  }
+  @keyframes drift { to { transform: translate3d(8vmax, 6vmax, 0) scale(1.15) } }
+
+  main {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: center;
+    gap: 26px;
+  }
+
+  .glass {
+    background: var(--glass);
+    border: 1px solid var(--edge);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+  }
+
+  .card {
+    padding: clamp(28px, 5vw, 48px) clamp(34px, 7vw, 68px);
+    border-radius: 40px;
+    box-shadow: 0 28px 70px -22px rgba(0, 0, 0, .85), var(--shine);
+    text-align: center;
+  }
+
+  .label {
+    margin: 0 0 clamp(14px, 3vw, 22px);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .34em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, .42);
+  }
+
+  .ring {
+    position: relative;
+    width: clamp(196px, 44vw, 252px);
+    aspect-ratio: 1;
+  }
+  .ring svg { position: absolute; inset: 0; transform: rotate(-90deg) }
+  .ring track { fill: none }
+
+  #kw {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: clamp(78px, 19vw, 118px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -.045em;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(135deg, var(--grad-a), var(--grad-b));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .pill {
+    width: min(92vw, 470px);
+    padding: 17px 34px;
+    border-radius: 999px;
+    box-shadow: 0 18px 44px -20px rgba(0, 0, 0, .8), var(--shine);
+    text-align: center;
+    font-size: clamp(15px, 3.4vw, 19px);
+    font-variant-numeric: tabular-nums;
+    color: rgba(255, 255, 255, .92);
+  }
+
+  .foot {
+    margin: -8px 0 0;
+    font-size: 12px;
+    letter-spacing: .09em;
+    color: rgba(255, 255, 255, .34);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body::before, body::after { animation: none }
+  }
+</style>
+</head>
+<body>
+<main>
+  <section class="card glass">
+    <p class="label">Kalenderwoche</p>
+    <div class="ring">
+      <svg viewBox="0 0 220 220" aria-hidden="true">
+        <defs>
+          <linearGradient id="arcGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="var(--grad-a)"/>
+            <stop offset="1" stop-color="var(--grad-b)"/>
+          </linearGradient>
+        </defs>
+        <circle cx="110" cy="110" r="100" fill="none"
+                stroke="rgba(255,255,255,.09)" stroke-width="6"/>
+        <circle id="arc" cx="110" cy="110" r="100" fill="none"
+                stroke="url(#arcGrad)" stroke-width="6" stroke-linecap="round"/>
+      </svg>
+      <strong id="kw">–</strong>
+    </div>
+  </section>
+
+  <p class="pill glass" id="range">–</p>
+  <p class="foot" id="foot"></p>
+</main>
+
+<script type="module">
+  import { isoWeek, weeksInIsoYear, isoWeekMonday, upcomingIsoYear, formatDe } from './kw.js';
+
+  // Route /<woche>, z.B. /7 — leer oder ungültig heißt "aktuelle Woche".
+  const wanted = (() => {
+    const n = Number(location.pathname.replaceAll('/', ''));
+    return Number.isInteger(n) && n >= 1 && n <= 53 ? n : null;
+  })();
+
+  const CIRC = 2 * Math.PI * 100;
+  arc.style.strokeDasharray = CIRC;
+
+  function render() {
+    const now = new Date();
+    const current = isoWeek(now);
+    const week = wanted ?? current.week;
+    const year = wanted ? upcomingIsoYear(wanted, now) : current.year;
+    const total = weeksInIsoYear(year);
+    const mo = isoWeekMonday(year, week);
+    const su = new Date(mo);
+    su.setDate(su.getDate() + 6);
+
+    kw.textContent = week;
+    range.textContent = `${formatDe(mo)} \u2013 ${formatDe(su)}`;
+    foot.textContent = `Woche ${week} von ${total} \u00b7 ${year}`;
+    arc.style.strokeDashoffset = CIRC * (1 - week / total);
+    document.title = `KW ${week}`;
+    return now.toDateString();
+  }
+
+  // Tageswechsel: Polling statt Mitternachts-Timer, damit Sleep und DST nichts kaputt machen.
+  let shown = render();
+  const refresh = () => { if (new Date().toDateString() !== shown) shown = render(); };
+  setInterval(refresh, 20_000);
+  document.addEventListener('visibilitychange', refresh);
+</script>
+</body>
+</html>

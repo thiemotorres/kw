@@ -1,0 +1,7 @@
+services:
+  kw:
+    image: ghcr.io/thiemotorres/kw:latest
+    container_name: kw
+    restart: unless-stopped
+    ports:
+      - "8080:80"
