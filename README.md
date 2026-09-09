@@ -34,7 +34,8 @@ docker compose up -d      # → http://<host>:8080
 ```
 
 Image: `ghcr.io/thiemotorres/kw:latest` (amd64 + arm64), gebaut per GitHub Actions
-bei jedem Push auf `main`. httpd läuft als `nobody`.
+bei jedem Push auf `main`. httpd läuft als `nobody`, Healthcheck ist im Image
+(alle 30 s `wget --spider` auf `/`) — Compose und Traefik übernehmen ihn automatisch.
 
 **Einmalig nach dem ersten Push:** das GHCR-Package auf public stellen unter
 https://github.com/users/thiemotorres/packages/container/kw/settings — sonst
