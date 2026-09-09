@@ -37,6 +37,4 @@ Image: `ghcr.io/thiemotorres/kw:latest` (amd64 + arm64), gebaut per GitHub Actio
 bei jedem Push auf `main`. httpd läuft als `nobody`, Healthcheck ist im Image
 (alle 30 s `wget --spider` auf `/`) — Compose und Traefik übernehmen ihn automatisch.
 
-**Einmalig nach dem ersten Push:** das GHCR-Package auf public stellen unter
-https://github.com/users/thiemotorres/packages/container/kw/settings — sonst
-braucht der Homelab-Host ein `docker login ghcr.io`.
+Das Package ist public, der Homelab-Host braucht also kein `docker login ghcr.io`.
