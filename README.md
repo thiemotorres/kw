@@ -32,5 +32,5 @@ Image: `ghcr.io/thiemotorres/kw:latest` (amd64 + arm64), gebaut per GitHub Actio
 bei jedem Push auf `main`.
 
 **Einmalig nach dem ersten Push:** das GHCR-Package auf public stellen
-(Repo → Packages → kw → Package settings → Change visibility), sonst braucht der
+unter https://github.com/users/thiemotorres/packages/container/kw/settings, sonst braucht der
 Homelab-Host ein `docker login ghcr.io`.
