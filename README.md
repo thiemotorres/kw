@@ -1,7 +1,7 @@
 # KW
 
 Zeigt die aktuelle Kalenderwoche (ISO 8601) und ihre Datumsrange. Statische Seite,
-keine Abhängigkeiten, kein Build-Step.
+keine Abhängigkeiten, kein Build-Step. Image: **2,8 MB** (busybox httpd).
 
 ## Routes
 
@@ -10,7 +10,8 @@ keine Abhängigkeiten, kein Build-Step.
 | `/`  | aktuelle KW |
 | `/7` | KW 7 — im aktuellen Jahr, falls noch nicht vorbei, sonst im nächsten |
 
-Ungültige Werte (`/0`, `/54`, `/foo`) fallen auf die aktuelle KW zurück.
+`/7` redirected auf `/7/` (busybox httpd kann nicht rewriten, jede Woche liegt als
+Verzeichnis im Image). Gültig ist `1`–`53`, alles andere gibt ein echtes 404.
 
 ## Lokal
 
@@ -19,8 +20,8 @@ node test.mjs                        # Wochenlogik prüfen
 docker build -t kw . && docker run --rm -p 8080:80 kw
 ```
 
-Ohne Docker: `python3 -m http.server 8080` — nicht per `file://` öffnen,
-ES-Module brauchen HTTP. Routes wie `/7` gehen nur hinter nginx.
+Ohne Docker: `python3 -m http.server 8080` — zeigt nur `/`, die Wochen-Routes
+brauchen den Container. Nicht per `file://` öffnen, ES-Module brauchen HTTP.
 
 ## Homelab
 
@@ -29,8 +30,8 @@ docker compose up -d      # → http://<host>:8080
 ```
 
 Image: `ghcr.io/thiemotorres/kw:latest` (amd64 + arm64), gebaut per GitHub Actions
-bei jedem Push auf `main`.
+bei jedem Push auf `main`. httpd läuft als `nobody`.
 
-**Einmalig nach dem ersten Push:** das GHCR-Package auf public stellen
-unter https://github.com/users/thiemotorres/packages/container/kw/settings, sonst braucht der
-Homelab-Host ein `docker login ghcr.io`.
+**Einmalig nach dem ersten Push:** das GHCR-Package auf public stellen unter
+https://github.com/users/thiemotorres/packages/container/kw/settings — sonst
+braucht der Homelab-Host ein `docker login ghcr.io`.
